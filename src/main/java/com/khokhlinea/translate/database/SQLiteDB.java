@@ -1,5 +1,7 @@
 package com.khokhlinea.translate.database;
 
+import com.khokhlinea.translate.connection.MyConnection;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,11 +10,18 @@ import java.sql.*;
 import java.util.Date;
 
 public class SQLiteDB {
+    private MyConnection myConnection;
     private Connection connection;
     private Statement statement;
     private PreparedStatement ps;
+    private static final SQLiteDB ourInstance = new SQLiteDB();
 
-    public SQLiteDB() {
+    public static SQLiteDB getInstance() {
+        return ourInstance;
+    }
+
+    private SQLiteDB() {
+        myConnection = new MyConnection();
         connect();
     }
 
@@ -55,17 +64,17 @@ public class SQLiteDB {
     }
 
     private String getIP() {
-        String ip = "";
         try {
-            URL myIpURL = new URL("http://checkip.amazonaws.com");
+            URL myIpURL = new URL(myConnection.getProperties().getProperty("myIpURL"));
             BufferedReader in = new BufferedReader(new InputStreamReader(
                     myIpURL.openStream()));
-            ip = in.readLine();
+            return in.readLine();
         } catch (IOException e) {
             e.printStackTrace();
+            return "";
         }
-        return ip;
     }
+
     public void disconnect() {
         try {
             statement.close();
