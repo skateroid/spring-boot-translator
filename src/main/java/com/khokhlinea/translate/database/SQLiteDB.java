@@ -1,7 +1,10 @@
 package com.khokhlinea.translate.database;
 
 import com.khokhlinea.translate.connection.MyConnection;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -53,7 +56,7 @@ public class SQLiteDB {
             ps = connection.prepareStatement("INSERT INTO connection_info(time_of_request, params, ip) VALUES (?, ?, ?)");
             ps.setString(1, date.toString());
             ps.setString(2, params.toString());
-            ps.setString(3, getIP());
+            ps.setString(3, getUserIp());
             ps.addBatch();
             ps.executeBatch();
             connection.commit();
@@ -63,16 +66,10 @@ public class SQLiteDB {
         }
     }
 
-    private String getIP() {
-        try {
-            URL myIpURL = new URL(myConnection.getProperties().getProperty("myIpURL"));
-            BufferedReader in = new BufferedReader(new InputStreamReader(
-                    myIpURL.openStream()));
-            return in.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        }
+
+    private String getUserIp() {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        return request.getRemoteAddr();
     }
 
     public void disconnect() {
