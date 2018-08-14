@@ -24,6 +24,7 @@ public class TranslateController {
 //                            @RequestParam(value = "to") String to) {
 //        return myConnection.getTranslatedString(text, from, to);
 //    }
+
     @GetMapping
     public String translate(@RequestParam(value = "text") String text,
                             @RequestParam(value = "from") String from,
